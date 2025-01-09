@@ -1,27 +1,46 @@
 import os
 import threading
+import argparse
 
 import streaming
 import recording
 
+from config import Config
 
-# script parent path
-my_path = os.path.abspath(os.path.dirname(__file__))
+HERE = os.path.abspath(os.path.dirname(__file__))
+CONFIG_PATH = os.path.join(HERE, "config.json")
 
 # init logger
 # TODO
 
-def main():
-    try:
-        # start recording
-        threading.Thread(target=recording.record_frame, daemon=True).start()
 
-        # start steaming
-        streaming.run()
+def get_args():
+    parser = argparse.ArgumentParser("Webcam Recorder Streamer")
+    parser.add_argument(
+        "-p",
+        "--config-path",
+        type=str,
+        required=False,
+        help="Webcam recorder streamer config file path",
+        default=CONFIG_PATH,
+    )
+    args = parser.parse_args()
+    return args
 
-    except Exception as ex:
-        print("An exception has occured.")
+
+def main(config):
+    # start recording
+    thread = threading.Thread(target=recording.record_frame, args=[config], daemon=True)
+    thread.start()
+
+    # start steaming
+    streaming.run(config)
 
 
 if __name__ == "__main__":
-    main()
+    try:
+        args = get_args()
+        config = Config.load_json(args.config_path)
+        main(config)
+    except Exception as ex:
+        print("An exception has occured.")

@@ -1,24 +1,30 @@
 import cv2 as cv
 
 
-# TODO place in recording config
-camera_index = 0
-framesPerSecond = 30.0
-output_filename_seed = "webcam_output"
-
-
 frame = None
 
 
-def record_frame():
+def record_frame(config):
     global frame
 
-    cap = cv.VideoCapture(camera_index)
-    print(f"Video capture. IsOpened={cap.isOpened()}")
+    try:
+        cap = cv.VideoCapture(config.Recording.CameraIndex)
+        print(f"Video capture. IsOpened={cap.isOpened()}")
 
-    width = int(cap.get(cv.CAP_PROP_FRAME_WIDTH))
-    height = int(cap.get(cv.CAP_PROP_FRAME_HEIGHT))
-    fourcc = cv.VideoWriter_fourcc(*"XVID")
+        width = int(cap.get(cv.CAP_PROP_FRAME_WIDTH))
+        height = int(cap.get(cv.CAP_PROP_FRAME_HEIGHT))
+        fourcc = cv.VideoWriter_fourcc(*"XVID")
+
+        while True:
+            ret, frame = cap.read()
+            if not ret:
+                print(f"Read frame. Return={ret}")
+                break
+
+        cap.release()
+    except Exception as ex:
+        print(f"An exception has occured.")
+        cap.release()
 
     while True:
         ret, frame = cap.read()

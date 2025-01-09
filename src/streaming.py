@@ -7,13 +7,8 @@ from fastapi.responses import HTMLResponse, FileResponse, StreamingResponse
 from fastapi.middleware.cors import CORSMiddleware
 
 
-# TODO get it from a config file
-streaming_port = 5000
-streaming_host = "0.0.0.0"
+HERE = os.path.abspath(os.path.dirname(__file__))
 
-
-# script parent path
-my_path = os.path.abspath(os.path.dirname(__file__))
 
 # init FastAPI app
 app = fastapi.FastAPI()
@@ -28,7 +23,7 @@ app.add_middleware(
 
 @app.get("/", response_class=HTMLResponse)
 async def get_index():
-    return FileResponse(os.path.join(my_path, "index.html"))
+    return FileResponse(os.path.join(HERE, "index.html"))
 
 
 @app.get("/video_feed")
@@ -38,5 +33,5 @@ async def get_video_feed():
     )
 
 
-def run():
-    uvicorn.run(app, host=streaming_host, port=streaming_port)
+def run(config):
+    uvicorn.run(app, host=config.Streaming.Host, port=config.Streaming.Port)

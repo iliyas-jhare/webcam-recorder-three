@@ -1,0 +1,12 @@
+{
+    "Streaming": {
+        "Host": "0.0.0.0",
+        "Port": 5000
+    },
+    "Recording": {
+        "CameraIndex": 0,
+        "FramesPerSecond": 20,
+        "OutputFileNameSeed": "webcam_out",
+        "OutputPath": null
+    }
+}
