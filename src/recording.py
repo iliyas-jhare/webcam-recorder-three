@@ -1,4 +1,8 @@
 import cv2 as cv
+import logging_utils
+
+# Logger
+logger = logging_utils.get_logger(__name__)
 
 
 frame = None
@@ -9,7 +13,10 @@ def record_frame(config):
 
     try:
         cap = cv.VideoCapture(config.Recording.CameraIndex)
-        print(f"Video capture. IsOpened={cap.isOpened()}")
+        if cap.isOpened():
+            logger.info(f"Video capture init. IsOpened={cap.isOpened()}")
+        else:
+            logger.error(f"Video capture init. IsOpened={cap.isOpened()}")
 
         width = int(cap.get(cv.CAP_PROP_FRAME_WIDTH))
         height = int(cap.get(cv.CAP_PROP_FRAME_HEIGHT))
@@ -18,35 +25,29 @@ def record_frame(config):
         while True:
             ret, frame = cap.read()
             if not ret:
-                print(f"Read frame. Return={ret}")
+                logger.error(f"Read frame. Return={ret}")
                 break
-
+    except Exception as e:
+        logger.exception(e)
+    finally:
         cap.release()
-    except Exception as ex:
-        print(f"An exception has occured.")
-        cap.release()
-
-    while True:
-        ret, frame = cap.read()
-        if not ret:
-            print(f"Read frame. Return={ret}")
-            break
-
-    cap.release()
 
 
 def get_frame():
     global frame
 
-    while True:
-        if frame is None:
-            print("Frame is None. Skipping.")
-            continue
-        success, buffer = cv.imencode(".jpg", frame)
-        if not success:
-            print("Failed to encode frame.")
-            continue
-        yield (
-            b"--frame\r\n"
-            b"Content-Type: image/jpg\r\n\r\n" + bytearray(buffer) + b"\r\n\r\n"
-        )
+    try:
+        while True:
+            if frame is None:
+                logger.error("Frame is None here.")
+                continue
+            success, buffer = cv.imencode(".jpg", frame)
+            if not success:
+                logger.error("Failed to encode frame.")
+                continue
+            yield (
+                b"--frame\r\n"
+                b"Content-Type: image/jpg\r\n\r\n" + bytearray(buffer) + b"\r\n\r\n"
+            )
+    except Exception as e:
+        logger.exception(e)

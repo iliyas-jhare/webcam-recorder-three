@@ -1,4 +1,8 @@
 import json
+import logging_utils
+
+# Logger
+logger = logging_utils.get_logger(__name__)
 
 
 class Dict(dict):
@@ -35,5 +39,5 @@ class Config(object):
             with open(path, "r") as f:
                 ret = Config.load_data(json.loads(f.read()))
             return ret
-        except Exception as ex:
-            print("An exception has occured.")
+        except Exception as e:
+            logger.exception(e)

@@ -2,16 +2,19 @@ import os
 import threading
 import argparse
 
+import logging_utils
 import streaming
 import recording
-
 from config import Config
 
+
+# Constants
 HERE = os.path.abspath(os.path.dirname(__file__))
 CONFIG_PATH = os.path.join(HERE, "config.json")
 
-# init logger
-# TODO
+
+# Logger
+logger = logging_utils.get_logger(__name__)
 
 
 def get_args():
@@ -28,19 +31,19 @@ def get_args():
     return args
 
 
-def main(config):
+def main(args):
+    logger.info("Start")
+    # load config.json
+    config = Config.load_json(args.config_path)
     # start recording
-    thread = threading.Thread(target=recording.record_frame, args=[config], daemon=True)
-    thread.start()
-
-    # start steaming
-    streaming.run(config)
+    threading.Thread(target=recording.record_frame, args=[config], daemon=True).start()
+    # start streaming
+    streaming.start(config)
+    logger.info("End")
 
 
 if __name__ == "__main__":
     try:
-        args = get_args()
-        config = Config.load_json(args.config_path)
-        main(config)
-    except Exception as ex:
-        print("An exception has occured.")
+        main(get_args())
+    except Exception as e:
+        logger.exception(e)
