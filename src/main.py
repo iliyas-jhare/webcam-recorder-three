@@ -1,6 +1,7 @@
 import os
 import threading
 import argparse
+import signal
 
 import logging_utils
 import streaming
@@ -40,6 +41,16 @@ def main(args):
     # start streaming
     streaming.start(config)
     logger.info("End")
+
+
+# Detect CTRL+C key press
+def signal_handler(sig, f):
+    if sig == signal.SIGINT:
+        recording.signal_handler(sig, f)
+        logger.info("Application shutdown. (CTRL+C)")
+
+
+signal.signal(signal.SIGINT, signal_handler)
 
 
 if __name__ == "__main__":

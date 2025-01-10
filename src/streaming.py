@@ -34,7 +34,7 @@ async def get_index():
         logger.exception(e)
 
 
-@app.get("/video_feed")
+@app.get("/video_feed", response_class=StreamingResponse)
 async def get_video_feed():
     try:
         return StreamingResponse(

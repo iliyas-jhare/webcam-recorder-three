@@ -1,5 +1,3 @@
-import signal
-
 import cv2 as cv
 
 import logging_utils
@@ -11,16 +9,6 @@ logger = logging_utils.get_logger(__name__)
 # Globals
 frame = None
 shutting_down = False
-
-
-# Detect CTRL+C key press
-def signal_handler(s, f):
-    global shutting_down
-    shutting_down = True
-    logger.info(f"Shutdown (CTRL+C) requested. Flag={shutting_down}")
-
-
-signal.signal(signal.SIGINT, signal_handler)
 
 
 def record_frame(config):
@@ -70,3 +58,9 @@ def get_frame():
             )
     except Exception as e:
         logger.exception(e)
+
+
+# Detect CTRL+C key press
+def signal_handler(s, f):
+    global shutting_down
+    shutting_down = True
