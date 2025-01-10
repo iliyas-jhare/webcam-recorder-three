@@ -1,21 +1,21 @@
 import os
 import fastapi
 import uvicorn
-import recording
 
+import recording
 import logging_utils
 
 from fastapi.responses import HTMLResponse, FileResponse, StreamingResponse
 from fastapi.middleware.cors import CORSMiddleware
 
-
+# Constants
 HERE = os.path.abspath(os.path.dirname(__file__))
-
+INDEX_HTML_PATH = os.path.join(HERE, "index.html")
 
 # Logger
 logger = logging_utils.get_logger(__name__)
 
-# init FastAPI app
+# FASTAPI app
 app = fastapi.FastAPI()
 app.add_middleware(
     CORSMiddleware,
@@ -29,7 +29,7 @@ app.add_middleware(
 @app.get("/", response_class=HTMLResponse)
 async def get_index():
     try:
-        return FileResponse(os.path.join(HERE, "index.html"))
+        return FileResponse(INDEX_HTML_PATH)
     except Exception as e:
         logger.exception(e)
 
