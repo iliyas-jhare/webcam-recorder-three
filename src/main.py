@@ -6,7 +6,9 @@ import signal
 import logging_utils
 import streaming
 import recording
+
 from config import Config
+from time import sleep
 
 
 # Constants
@@ -19,6 +21,7 @@ logger = logging_utils.get_logger(__name__)
 
 
 def get_args():
+    """Parse application command arguments"""
     parser = argparse.ArgumentParser("Webcam Recorder Streamer")
     parser.add_argument(
         "-p",
@@ -38,13 +41,16 @@ def main(args):
     config = Config.load_json(args.config_path)
     # start recording
     threading.Thread(target=recording.record_frame, args=[config], daemon=True).start()
+    # delay streaming until video capture is openedf
+    sleep(config.Streaming.VideoCaptureOpenedDelaySec)
     # start streaming
-    streaming.start(config)
+    if recording.video_opened:
+        streaming.start(config)
     logger.info("End")
 
 
-# Detect CTRL+C key press
 def signal_handler(sig, f):
+    """Detect Ctrl+C signal and handler is it in here"""
     if sig == signal.SIGINT:
         recording.signal_handler(sig, f)
         logger.info("Application shutdown. (CTRL+C)")

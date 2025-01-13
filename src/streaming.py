@@ -28,6 +28,7 @@ app.add_middleware(
 
 @app.get("/", response_class=HTMLResponse)
 async def get_index():
+    """Sends index file HTML reponse"""
     try:
         return FileResponse(INDEX_HTML_PATH)
     except Exception as e:
@@ -36,6 +37,7 @@ async def get_index():
 
 @app.get("/video_feed", response_class=StreamingResponse)
 async def get_video_feed():
+    """Sends encoded video frame streaming reponse."""
     try:
         return StreamingResponse(
             recording.get_frame(),
@@ -46,6 +48,7 @@ async def get_video_feed():
 
 
 def start(config):
+    """Starts FastAPI server"""
     try:
         uvicorn.run(app, host=config.Streaming.Host, port=config.Streaming.Port)
     except Exception as e:
