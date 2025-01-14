@@ -3,7 +3,7 @@ import threading
 import argparse
 import signal
 
-import logging_utils
+import logging_wrapper
 import streaming
 import recording
 
@@ -15,9 +15,8 @@ from time import sleep
 HERE = os.path.abspath(os.path.dirname(__file__))
 CONFIG_PATH = os.path.join(HERE, "config.json")
 
-
 # Logger
-logger = logging_utils.get_logger(__name__)
+log = logging_wrapper.LoggingWrapper().get_logger(__name__)
 
 
 def get_args():
@@ -36,7 +35,8 @@ def get_args():
 
 
 def main(args):
-    logger.info("Start")
+    # logger
+    log.info("Start")
     # load config.json
     config = Config.load_json(args.config_path)
     # start recording
@@ -48,14 +48,14 @@ def main(args):
     # start streaming
     if recording.video_opened:
         streaming.start(config)
-    logger.info("End")
+    log.info("End")
 
 
 def signal_handler(sig, f):
     """Detect Ctrl+C signal and handler is it in here"""
     if sig == signal.SIGINT:
         recording.signal_handler(sig, f)
-        logger.info("Application shutdown. (CTRL+C)")
+        log.info("Application shutdown. (CTRL+C)")
 
 
 signal.signal(signal.SIGINT, signal_handler)
@@ -65,4 +65,4 @@ if __name__ == "__main__":
     try:
         main(get_args())
     except Exception as e:
-        logger.exception(e)
+        log.exception(e)

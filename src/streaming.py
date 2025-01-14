@@ -3,7 +3,7 @@ import fastapi
 import uvicorn
 
 import recording
-import logging_utils
+import logging_wrapper
 
 from fastapi.responses import HTMLResponse, FileResponse, StreamingResponse
 from fastapi.middleware.cors import CORSMiddleware
@@ -13,7 +13,7 @@ HERE = os.path.abspath(os.path.dirname(__file__))
 INDEX_HTML_PATH = os.path.join(HERE, "index.html")
 
 # Logger
-logger = logging_utils.get_logger(__name__)
+log = logging_wrapper.LoggingWrapper().get_logger(__name__)
 
 # FASTAPI app
 app = fastapi.FastAPI()
@@ -32,7 +32,7 @@ async def get_index():
     try:
         return FileResponse(INDEX_HTML_PATH)
     except Exception as e:
-        logger.exception(e)
+        log.exception(e)
 
 
 @app.get("/video_feed", response_class=StreamingResponse)
@@ -44,7 +44,7 @@ async def get_video_feed():
             media_type="multipart/x-mixed-replace; boundary=frame",
         )
     except Exception as e:
-        logger.exception(e)
+        log.exception(e)
 
 
 def start(config):
@@ -52,4 +52,4 @@ def start(config):
     try:
         uvicorn.run(app, host=config.Streaming.Host, port=config.Streaming.Port)
     except Exception as e:
-        logger.exception(e)
+        log.exception(e)

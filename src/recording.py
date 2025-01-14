@@ -2,11 +2,11 @@ import os
 import time
 import cv2 as cv
 
-import logging_utils
+import logging_wrapper
 
 
 # Logger
-logger = logging_utils.get_logger(__name__)
+log = logging_wrapper.LoggingWrapper().get_logger(__name__)
 
 
 # Globals
@@ -29,7 +29,7 @@ def capture_video_frame(config):
             # check if video capture was opened
             video_opened = capture.isOpened()
             if video_opened:
-                logger.info(
+                log.info(
                     f"Video capture instantiated. IsOpened={video_opened}. BackendName={capture.getBackendName()}."
                 )
                 while True:
@@ -43,11 +43,11 @@ def capture_video_frame(config):
                         height=int(capture.get(cv.CAP_PROP_FRAME_HEIGHT)),
                     )
             else:
-                logger.error(f"Video capture is not opened. IsOpened={video_opened}")
+                log.error(f"Video capture is not opened. IsOpened={video_opened}")
         else:
-            logger.error("Video capture is None.")
+            log.error("Video capture is None.")
     except Exception as e:
-        logger.exception(e)
+        log.exception(e)
     finally:
         if capture:
             capture.release()
@@ -62,18 +62,18 @@ def get_video_frame():
             if shutting_down:
                 break
             if frame is None:
-                logger.error("Frame is None.")
+                log.error("Frame is None.")
                 continue
             success, buffer = cv.imencode(ext=".jpg", img=frame)
             if not success:
-                logger.error("Failed to encode the frame.")
+                log.error("Failed to encode the frame.")
                 continue
             yield (
                 b"--frame\r\n"
                 b"Content-Type: image/jpg\r\n\r\n" + bytearray(buffer) + b"\r\n\r\n"
             )
     except Exception as e:
-        logger.exception(e)
+        log.exception(e)
 
 
 # Detect CTRL+C key press
@@ -90,7 +90,7 @@ def write_video_frame(config, width, height):
         # read frames and write them to a file
         init_video_writer(config, width, height)
         if writer:
-            logger.info(f"Video writer instantiated. Output={output_path}")
+            log.info(f"Video writer instantiated. Output={output_path}")
             start = time.time()
             while time.time() - start < config.Recording.Duration:
                 ret, frame = capture.read()
@@ -100,14 +100,14 @@ def write_video_frame(config, width, height):
                     # write fram
                     writer.write(frame)
                 else:
-                    logger.error(f"Read frame has failed. Flag={ret}")
+                    log.error(f"Read frame has failed. Flag={ret}")
                     break
             # let go of the writer
             writer.release()
         else:
-            logger.error("Video writer is None.")
+            log.error("Video writer is None.")
     except Exception as e:
-        logger.exception(e)
+        log.exception(e)
     finally:
         if writer:
             writer.release()

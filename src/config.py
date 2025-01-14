@@ -1,8 +1,8 @@
 import json
-import logging_utils
+import logging_wrapper
 
 # Logger
-logger = logging_utils.get_logger(__name__)
+log = logging_wrapper.LoggingWrapper().get_logger(__name__)
 
 
 class Dict(dict):
@@ -46,4 +46,4 @@ class Config(object):
                 ret = Config.load_data(json.loads(f.read()))
             return ret
         except Exception as e:
-            logger.exception(e)
+            log.exception(e)
