@@ -24,7 +24,7 @@ def capture_video_frame(config):
     global capture, video_opened
 
     try:
-        capture = cv.VideoCapture(config.Recording.CameraIndex)
+        capture = cv.VideoCapture(index=config.Recording.CameraIndex)
         if capture:
             # check if video capture was opened
             video_opened = capture.isOpened()
@@ -38,7 +38,7 @@ def capture_video_frame(config):
                         break
                     # write video frame
                     write_video_frame(
-                        config,
+                        config=config,
                         width=int(capture.get(cv.CAP_PROP_FRAME_WIDTH)),
                         height=int(capture.get(cv.CAP_PROP_FRAME_HEIGHT)),
                     )
@@ -64,7 +64,7 @@ def get_video_frame():
             if frame is None:
                 logger.error("Frame is None.")
                 continue
-            success, buffer = cv.imencode(".jpg", frame)
+            success, buffer = cv.imencode(ext=".jpg", img=frame)
             if not success:
                 logger.error("Failed to encode the frame.")
                 continue
@@ -119,7 +119,7 @@ def init_video_writer(config, width, height):
 
     init_output_file_path(config)
     writer = cv.VideoWriter(
-        output_path,
+        filename=output_path,
         fourcc=cv.VideoWriter_fourcc(*config.Recording.WriterFourCC),
         fps=config.Recording.FramesPerSecond,
         frameSize=(width, height),
@@ -143,13 +143,13 @@ def init_output_file_path(config):
 
 def put_frame_text():
     """Puts frame text on the frame."""
-    global frame, frame_count
+    global frame_count
     frame_count += 1
     cv.putText(
-        frame,
+        img=frame,
         text=f"Frame {frame_count}",
-        org=(10, 30),
-        fontFace=cv.FONT_HERSHEY_SIMPLEX,
+        org=(10, 35),
+        fontFace=cv.FONT_HERSHEY_DUPLEX,
         fontScale=1,
         color=(0, 0, 0),
         thickness=1,
