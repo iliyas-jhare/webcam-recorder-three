@@ -40,8 +40,10 @@ def main(args):
     # load config.json
     config = Config.load_json(args.config_path)
     # start recording
-    threading.Thread(target=recording.record_frame, args=[config], daemon=True).start()
-    # delay streaming until video capture is openedf
+    threading.Thread(
+        target=recording.capture_video_frame, args=[config], daemon=True
+    ).start()
+    # delay streaming until video capture is opened
     sleep(config.Streaming.VideoCaptureOpenedDelaySec)
     # start streaming
     if recording.video_opened:

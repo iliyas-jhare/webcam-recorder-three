@@ -40,7 +40,7 @@ async def get_video_feed():
     """Sends encoded video frame streaming reponse."""
     try:
         return StreamingResponse(
-            recording.get_frame(),
+            recording.get_video_frame(),
             media_type="multipart/x-mixed-replace; boundary=frame",
         )
     except Exception as e:
