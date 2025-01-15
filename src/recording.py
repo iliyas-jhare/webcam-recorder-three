@@ -37,11 +37,7 @@ def capture_video_frame(config):
                     if shutting_down:
                         break
                     # write video frame
-                    write_video_frame(
-                        config=config,
-                        width=int(capture.get(cv.CAP_PROP_FRAME_WIDTH)),
-                        height=int(capture.get(cv.CAP_PROP_FRAME_HEIGHT)),
-                    )
+                    write_video_frame(config)
             else:
                 log.error(f"Video capture is not opened. IsOpened={video_opened}")
         else:
@@ -82,13 +78,13 @@ def signal_handler(s, f):
     shutting_down = True
 
 
-def write_video_frame(config, width, height):
+def write_video_frame(config):
     """Write video frames to the output file."""
     global writer, frame
 
     try:
         # read frames and write them to a file
-        init_video_writer(config, width, height)
+        init_video_writer(config)
         if writer:
             log.info(f"Video writer instantiated. Output={output_path}")
             start = time.time()
@@ -113,11 +109,13 @@ def write_video_frame(config, width, height):
             writer.release()
 
 
-def init_video_writer(config, width, height):
+def init_video_writer(config):
     """Create VideoWriter instance"""
     global writer
 
     init_output_file_path(config)
+    width = int(capture.get(cv.CAP_PROP_FRAME_WIDTH))
+    height = int(capture.get(cv.CAP_PROP_FRAME_HEIGHT))
     writer = cv.VideoWriter(
         filename=output_path,
         fourcc=cv.VideoWriter_fourcc(*config.Recording.WriterFourCC),
