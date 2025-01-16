@@ -12,7 +12,6 @@ log = logging_wrapper.LoggingWrapper().get_logger(__name__)
 # Globals
 capture = None
 frame = None
-frame_count = 0
 writer = None
 output_path = None
 video_opened = False
@@ -92,7 +91,12 @@ def write_video_frame(config):
                 ret, frame = capture.read()
                 if ret:
                     # add frame text
-                    put_frame_text()
+                    put_frame_text(
+                        [
+                            f"Time: {time.strftime('%Y-%m-%d %H:%M:%S')}",
+                            f"Camera: {config.Recording.CameraIndex}",
+                        ]
+                    )
                     # write fram
                     writer.write(frame)
                 else:
@@ -139,17 +143,34 @@ def init_output_file_path(config):
         output_path = name
 
 
-def put_frame_text():
-    """Puts frame text on the frame."""
-    global frame_count
-    frame_count += 1
-    cv.putText(
-        img=frame,
-        text=f"Frame {frame_count}",
-        org=(10, 35),
-        fontFace=cv.FONT_HERSHEY_DUPLEX,
-        fontScale=1,
-        color=(0, 0, 0),
-        thickness=1,
-        lineType=cv.LINE_AA,
-    )
+def put_frame_text(lines: list):
+    """Puts frame text lines on the frame."""
+    if not lines:
+        log.info("Text lines are none or empty.")
+        return
+
+    font_scale = 0.6
+    line_color = (40, 240, 240)  # yellowish color in BGR (hex=#f2ef1e)
+    line_thickness = 1
+    font_face = cv.FONT_HERSHEY_DUPLEX
+    line_type = cv.LINE_AA
+
+    # top-left corner of the frame. bottom-left corner of the text
+    text_position = (10, 25)
+    text = lines[0]  # first line
+    text_size = cv.getTextSize(text, font_face, font_scale, line_thickness)
+    line_height = text_size[1] + 20
+    x0, y0 = text_position
+
+    for index, line in enumerate(lines):
+        y = y0 + index * line_height
+        cv.putText(
+            frame,
+            line,
+            (x0, y),
+            font_face,
+            font_scale,
+            line_color,
+            line_thickness,
+            line_type,
+        )
