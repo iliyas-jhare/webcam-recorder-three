@@ -1,4 +1,4 @@
-#!/bin/bash
+#!usr/bin/env python
 
 # Colors
 GREEN='\033[0;32m'

@@ -6,8 +6,8 @@
     "Recording": {
         "CameraIndex": 0,
         "FramesPerSecond": 20.0,
-        "OutputName": "out.avi",
-        "OutputPath": "./out",
+        "OutputName": "recording.avi",
+        "OutputPath": "./recordings",
         "WriterFourCC": "XVID",
         "Duration": 30.0
     }

@@ -172,5 +172,5 @@ cython_debug/
 
 
 # Program output
-out/
+recordings/
 logs/
