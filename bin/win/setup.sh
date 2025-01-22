@@ -1,7 +1,11 @@
 #!/bin/bash
 
+# Directories
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
+ROOT_DIR=$SCRIPT_DIR/../../
+pushd $ROOT_DIR
+
 # Colors
-GREEN='\033[0;32m'
 CYAN='\033[0;36m'
 RESET='\033[0m'
 
@@ -11,7 +15,7 @@ python -m venv env
 
 # Active the virtual environment
 echo -e "${CYAN}Activating virtual environment.${RESET}"
-activate_env() { . $PWD/env/Scripts/activate; }
+activate_env() { . ./env/Scripts/activate; }
 activate_env
 
 # Check virtual environment activated
@@ -24,6 +28,7 @@ python -m pip install -U pip
 
 # Install python requirements
 echo -e "${CYAN}Installing requirements.${RESET}"
-pip install -r ./requirements.txt
+pip install -r ./bin/requirements.txt
 
-echo -e "${GREEN}Done.${RESET}"
+echo -e "${CYAN}Setup finished.${RESET}"
+popd

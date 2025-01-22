@@ -1,7 +1,11 @@
-#!usr/bin/env python
+#!/bin/bash
+
+# Directories
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
+ROOT_DIR=$SCRIPT_DIR/../../
+pushd $ROOT_DIR
 
 # Colors
-GREEN='\033[0;32m'
 CYAN='\033[0;36m'
 RESET='\033[0m'
 
@@ -24,6 +28,7 @@ python3 -m pip install -U pip
 
 # Install python requirements
 echo -e "${CYAN}Installing requirements.${RESET}"
-pip install -r ./requirements.txt
+pip install -r ./bin/requirements.txt
 
-echo -e "${GREEN}Done.${RESET}"
+echo -e "${CYAN}Setup finished.${RESET}"
+popd
