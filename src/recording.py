@@ -13,6 +13,7 @@ log = logging_wrapper.LoggingWrapper().get_logger(__name__)
 capture = None
 frame = None
 frame_count = 0
+frame_text = []
 writer = None
 output_path = None
 video_opened = False
@@ -72,6 +73,11 @@ def get_video_frame():
         log.exception(e)
 
 
+def get_frame_text():
+    """Returns frame text."""
+    return frame_text
+
+
 # Detect CTRL+C key press
 def signal_handler(s, f):
     global shutting_down
@@ -80,7 +86,7 @@ def signal_handler(s, f):
 
 def write_video_frame(config):
     """Write video frames to the output file."""
-    global writer, frame, frame_count
+    global writer, frame, frame_count, frame_text
 
     try:
         # read frames and write them to a file
@@ -93,13 +99,12 @@ def write_video_frame(config):
                 if ret:
                     frame_count += 1
                     # add frame text
-                    put_frame_text(
-                        [
-                            f"Time: {time.strftime('%Y-%m-%d %H:%M:%S')}",
-                            f"Camera: {config.Recording.CameraIndex}",
-                            f"Frame count: {frame_count}",
-                        ]
-                    )
+                    frame_text = [
+                        f"Time: {time.strftime('%Y-%m-%d %H:%M:%S')}",
+                        f"Camera: {config.Recording.CameraIndex}",
+                        f"Frames: {frame_count}",
+                    ]
+                    put_frame_text()
                     # write fram
                     writer.write(frame)
                 else:
@@ -148,9 +153,9 @@ def init_output_file_path(config):
         output_path = name
 
 
-def put_frame_text(lines: list):
+def put_frame_text():
     """Puts frame text lines on the frame."""
-    if not lines:
+    if not frame_text:
         log.info("Text lines are none or empty.")
         return
 
@@ -162,12 +167,12 @@ def put_frame_text(lines: list):
 
     # top-left corner of the frame. bottom-left corner of the text
     text_position = (10, 25)
-    text = lines[0]  # first line
+    text = frame_text[0]  # first line
     text_size = cv.getTextSize(text, font_face, font_scale, line_thickness)
     line_height = text_size[1] + 12
     x0, y0 = text_position
 
-    for index, line in enumerate(lines):
+    for index, line in enumerate(frame_text):
         y = y0 + index * line_height
         cv.putText(
             frame,
