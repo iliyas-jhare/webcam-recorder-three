@@ -7,11 +7,11 @@ RESET='\033[0m'
 
 # Install python virtual environment
 echo -e "${CYAN}Installing Python virtual environment.${RESET}"
-python -m venv env
+python3 -m venv env
 
 # Active the virtual environment
 echo -e "${CYAN}Activating virtual environment.${RESET}"
-activate_env() { . $PWD/env/Scripts/activate; }
+activate_env() { source ./env/bin/activate; }
 activate_env
 
 # Check virtual environment activated
@@ -20,7 +20,7 @@ pip -V
 
 # Upgrade pip
 echo -e "${CYAN}Upgrading pip.${RESET}"
-python -m pip install -U pip
+python3 -m pip install -U pip
 
 # Install python requirements
 echo -e "${CYAN}Installing requirements.${RESET}"
