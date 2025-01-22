@@ -12,6 +12,7 @@ log = logging_wrapper.LoggingWrapper().get_logger(__name__)
 # Globals
 capture = None
 frame = None
+frame_count = 0
 writer = None
 output_path = None
 video_opened = False
@@ -57,12 +58,12 @@ def get_video_frame():
             if shutting_down:
                 break
             if frame is None:
-                log.error("Frame is None.")
-                continue
-            success, buffer = cv.imencode(ext=".jpg", img=frame)
-            if not success:
-                log.error("Failed to encode the frame.")
-                continue
+                buffer = b""
+            else:
+                success, buffer = cv.imencode(ext=".jpg", img=frame)
+                if not success:
+                    log.error("Failed to encode the frame.")
+                    continue
             yield (
                 b"--frame\r\n"
                 b"Content-Type: image/jpg\r\n\r\n" + bytearray(buffer) + b"\r\n\r\n"
@@ -79,7 +80,7 @@ def signal_handler(s, f):
 
 def write_video_frame(config):
     """Write video frames to the output file."""
-    global writer, frame
+    global writer, frame, frame_count
 
     try:
         # read frames and write them to a file
@@ -90,11 +91,13 @@ def write_video_frame(config):
             while time.time() - start < config.Recording.Duration:
                 ret, frame = capture.read()
                 if ret:
+                    frame_count += 1
                     # add frame text
                     put_frame_text(
                         [
                             f"Time: {time.strftime('%Y-%m-%d %H:%M:%S')}",
                             f"Camera: {config.Recording.CameraIndex}",
+                            f"Frame count: {frame_count}",
                         ]
                     )
                     # write fram
@@ -133,7 +136,9 @@ def init_output_file_path(config):
     global output_path
 
     stamp = time.strftime("%Y%m%d-%H%M%S")
-    name = f"{stamp}_{config.Recording.OutputName}"
+    name = (
+        f"{stamp}_webcam_{config.Recording.CameraIndex}_{config.Recording.OutputName}"
+    )
     if config.Recording.OutputPath:
         path = os.path.abspath(config.Recording.OutputPath)
         if not os.path.exists(path):
@@ -149,7 +154,7 @@ def put_frame_text(lines: list):
         log.info("Text lines are none or empty.")
         return
 
-    font_scale = 0.6
+    font_scale = 0.5
     line_color = (40, 240, 240)  # yellowish color in BGR (hex=#f2ef1e)
     line_thickness = 1
     font_face = cv.FONT_HERSHEY_DUPLEX
@@ -159,7 +164,7 @@ def put_frame_text(lines: list):
     text_position = (10, 25)
     text = lines[0]  # first line
     text_size = cv.getTextSize(text, font_face, font_scale, line_thickness)
-    line_height = text_size[1] + 20
+    line_height = text_size[1] + 12
     x0, y0 = text_position
 
     for index, line in enumerate(lines):

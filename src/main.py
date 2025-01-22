@@ -8,7 +8,6 @@ import streaming
 import recording
 
 from config import Config
-from time import sleep
 
 
 # Constants
@@ -43,11 +42,8 @@ def main(args):
     threading.Thread(
         target=recording.capture_video_frame, args=[config], daemon=True
     ).start()
-    # delay streaming until video capture is opened
-    sleep(config.Streaming.VideoCaptureOpenedDelaySec)
     # start streaming
-    if recording.video_opened:
-        streaming.start(config)
+    streaming.init(config)
     log.info("End")
 
 

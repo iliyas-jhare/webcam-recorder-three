@@ -7,13 +7,16 @@ import logging_wrapper
 
 from fastapi.responses import HTMLResponse, FileResponse, StreamingResponse
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 
 # Constants
 HERE = os.path.abspath(os.path.dirname(__file__))
-INDEX_HTML_PATH = os.path.join(HERE, "index.html")
+UI_DIR_PATH = os.path.join(HERE, "ui")
+INDEX_HTML_PATH = os.path.join(UI_DIR_PATH, "index.html")
 
 # Logger
 log = logging_wrapper.LoggingWrapper().get_logger(__name__)
+
 
 # FASTAPI app
 app = fastapi.FastAPI()
@@ -24,13 +27,16 @@ app.add_middleware(
     allow_methods=["*"],
     allow_credentials=True,
 )
+app.mount(
+    "/ui", StaticFiles(directory=UI_DIR_PATH, html=True, check_dir=True), name="ui"
+)
 
 
 @app.get("/", response_class=HTMLResponse)
 async def get_index():
     """Sends index file HTML reponse"""
     try:
-        return FileResponse(INDEX_HTML_PATH)
+        return FileResponse(INDEX_HTML_PATH, media_type="text/html")
     except Exception as e:
         log.exception(e)
 
@@ -47,7 +53,17 @@ async def get_video_feed():
         log.exception(e)
 
 
-def start(config):
+@app.post("/{command}")
+async def post_command(command: str):
+    """Receives recording command."""
+    try:
+        log.info(f"Command received: {command}")
+        # recording.on_command(command)
+    except Exception as e:
+        log.exception(e)
+
+
+def init(config):
     """Starts FastAPI server"""
     try:
         uvicorn.run(app, host=config.Streaming.Host, port=config.Streaming.Port)

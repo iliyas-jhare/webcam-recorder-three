@@ -1,13 +1,12 @@
 {
     "Streaming": {
         "Host": "0.0.0.0",
-        "Port": 5000,
-        "VideoCaptureOpenedDelaySec": 1.0
+        "Port": 5000
     },
     "Recording": {
         "CameraIndex": 0,
         "FramesPerSecond": 20.0,
-        "OutputName": "webcam_out.avi",
+        "OutputName": "out.avi",
         "OutputPath": "./out",
         "WriterFourCC": "XVID",
         "Duration": 30.0
