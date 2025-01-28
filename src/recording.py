@@ -1,12 +1,13 @@
 import os
 import time
+
 import cv2 as cv
 
 import logging_wrapper
 
 
 # Logger
-log = logging_wrapper.LoggingWrapper().get_logger(__name__)
+log = logging_wrapper.LoggingWrapper.get_logger_instance(__name__)
 
 
 # Globals
@@ -33,10 +34,8 @@ def capture_video_frame(config):
                 log.info(
                     f"Video capture instantiated. IsOpened={video_opened}. BackendName={capture.getBackendName()}."
                 )
-                while True:
-                    # stop if user has requested the app shutdown
-                    if shutting_down:
-                        break
+                # stop if user has requested the app shutdown
+                while not shutting_down:
                     # write video frame
                     write_video_frame(config)
             else:
@@ -55,9 +54,8 @@ def get_video_frame():
     global frame
 
     try:
-        while True:
-            if shutting_down:
-                break
+        # stop if user has requested the app shutdown
+        while not shutting_down:
             if frame is None:
                 buffer = b""
             else:
@@ -145,7 +143,7 @@ def init_output_file_path(config):
         f"{stamp}_webcam_{config.Recording.CameraIndex}_{config.Recording.OutputName}"
     )
     if config.Recording.OutputPath:
-        path = os.path.abspath(config.Recording.OutputPath)
+        path = config.Recording.OutputPath
         if not os.path.exists(path):
             os.makedirs(path)
         output_path = os.path.join(path, name)
@@ -160,7 +158,7 @@ def put_frame_text():
         return
 
     font_scale = 0.5
-    line_color = (40, 240, 240)  # yellowish color in BGR (hex=#f2ef1e)
+    line_color = (40, 240, 240)  # BGR (Golden Fizz - #F0F028)
     line_thickness = 1
     font_face = cv.FONT_HERSHEY_DUPLEX
     line_type = cv.LINE_AA

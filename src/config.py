@@ -2,7 +2,7 @@ import json
 import logging_wrapper
 
 # Logger
-log = logging_wrapper.LoggingWrapper().get_logger(__name__)
+log = logging_wrapper.LoggingWrapper.get_logger_instance(__name__)
 
 
 class Dict(dict):

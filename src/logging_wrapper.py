@@ -1,11 +1,11 @@
+import sys
+import os
+
 import logging
 import datetime
-import os
-import sys
 
-
-HERE = os.path.abspath(os.path.dirname(__file__))
-LOGS_PATH = os.path.join(HERE, "logs")
+# Constants
+LOGS_PATH = os.path.join(os.path.dirname(sys.argv[0]), "logs")
 
 
 class LoggingWrapper:
@@ -54,3 +54,7 @@ class LoggingWrapper:
         file_handler = self.create_file_handler(level)
         logger.addHandler(file_handler)
         return logger
+
+    @staticmethod
+    def get_logger_instance(name: str, level=logging.INFO):
+        return LoggingWrapper().get_logger(name, level)

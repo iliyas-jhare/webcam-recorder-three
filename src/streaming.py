@@ -15,7 +15,7 @@ UI_DIR_PATH = os.path.join(HERE, "ui")
 INDEX_HTML_PATH = os.path.join(UI_DIR_PATH, "index.html")
 
 # Logger
-log = logging_wrapper.LoggingWrapper().get_logger(__name__)
+log = logging_wrapper.LoggingWrapper.get_logger_instance(__name__)
 
 
 # FASTAPI app

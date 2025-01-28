@@ -1,3 +1,4 @@
+import sys
 import os
 import threading
 import argparse
@@ -11,22 +12,21 @@ from config import Config
 
 
 # Constants
-HERE = os.path.abspath(os.path.dirname(__file__))
-CONFIG_PATH = os.path.join(HERE, "config.json")
+CONFIG_PATH = os.path.join(os.path.dirname(sys.argv[0]), "config.json")
 
 # Logger
-log = logging_wrapper.LoggingWrapper().get_logger(__name__)
+log = logging_wrapper.LoggingWrapper.get_logger_instance(__name__)
 
 
 def get_args():
     """Parse application command arguments"""
-    parser = argparse.ArgumentParser("Webcam Recorder Streamer")
+    parser = argparse.ArgumentParser("Webcam Recorder-Streamer")
     parser.add_argument(
         "-p",
         "--config-path",
         type=str,
         required=False,
-        help="Webcam recorder streamer config file path",
+        help="Webcam recorder-streamer config file path",
         default=CONFIG_PATH,
     )
     args = parser.parse_args()
@@ -35,26 +35,29 @@ def get_args():
 
 def main(args):
     # logger
-    log.info("Start")
+    log.info(f"Start. File handler outputting to the path={logging_wrapper.LOGS_PATH}")
     # load config.json
     config = Config.load_json(args.config_path)
-    # start recording
-    threading.Thread(
-        target=recording.capture_video_frame, args=[config], daemon=True
-    ).start()
-    # start streaming
-    streaming.init(config)
+    if config:
+        # start recording
+        threading.Thread(
+            target=recording.capture_video_frame, args=[config], daemon=True
+        ).start()
+        # start streaming
+        streaming.init(config)
+    else:
+        log.error(f"Config could not be loaded. Path={args.config_path}")
     log.info("End")
 
 
 def signal_handler(sig, f):
-    """Detect Ctrl+C signal and handler is it in here"""
-    if sig == signal.SIGINT:
-        recording.signal_handler(sig, f)
-        log.info("Application shutdown. (CTRL+C)")
+    """Detect and handle Ctrl+C signal"""
+    recording.signal_handler(sig, f)
+    log.info("Application shutdown. (CTRL+C)")
+    sys.exit()
 
 
-signal.signal(signal.SIGINT, signal_handler)
+signal.signal(signal.SIGTERM, signal_handler)
 
 
 if __name__ == "__main__":
