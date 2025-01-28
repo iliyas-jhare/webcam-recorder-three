@@ -174,5 +174,7 @@ cython_debug/
 recordings/
 logs/
 
+# Unignore below
+!webcam_recorder.spec
 dist/*
 !dist/config.json
